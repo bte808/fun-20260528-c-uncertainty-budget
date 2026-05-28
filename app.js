@@ -92,6 +92,16 @@
     };
   }
 
+  function normalizeState(state = {}) {
+    return {
+      quantityName: cleanText(state.quantityName) || SAMPLE.quantityName,
+      resultValue: toNumber(state.resultValue, SAMPLE.resultValue),
+      resultUnit: cleanText(state.resultUnit) || SAMPLE.resultUnit,
+      coverageFactor: Math.max(0, toNumber(state.coverageFactor, SAMPLE.coverageFactor)),
+      rows: Array.isArray(state.rows) ? state.rows.map(normalizeRow) : defaultState().rows
+    };
+  }
+
   function calculateBudget(state) {
     const rows = (state.rows || []).map(normalizeRow).filter((row) => row.estimate !== 0);
     const items = rows.map((row) => {
@@ -217,6 +227,27 @@
     return lines.join("\n");
   }
 
+  function buildJsonBackup(state) {
+    return `${JSON.stringify(
+      {
+        app: "uncertainty-budget",
+        schemaVersion: 1,
+        state: normalizeState(state)
+      },
+      null,
+      2
+    )}\n`;
+  }
+
+  function parseJsonBackup(text) {
+    const parsed = JSON.parse(text);
+    const candidate = parsed && parsed.state ? parsed.state : parsed;
+    if (!candidate || typeof candidate !== "object" || !Array.isArray(candidate.rows)) {
+      throw new Error("Backup does not contain an uncertainty budget state.");
+    }
+    return normalizeState(candidate);
+  }
+
   function escapePipes(value) {
     return String(value || "").replace(/\|/g, "\\|");
   }
@@ -247,12 +278,13 @@
   }
 
   function writeState(dom, state) {
-    dom.quantityName.value = state.quantityName || "";
-    dom.resultValue.value = state.resultValue ?? "";
-    dom.resultUnit.value = state.resultUnit || "";
-    dom.coverageFactor.value = state.coverageFactor ?? 2;
+    const normalized = normalizeState(state);
+    dom.quantityName.value = normalized.quantityName || "";
+    dom.resultValue.value = normalized.resultValue ?? "";
+    dom.resultUnit.value = normalized.resultUnit || "";
+    dom.coverageFactor.value = normalized.coverageFactor ?? 2;
     dom.rowsBody.innerHTML = "";
-    (state.rows || []).forEach((row) => appendRow(dom, row));
+    normalized.rows.forEach((row) => appendRow(dom, row));
   }
 
   function appendRow(dom, row = {}) {
@@ -335,8 +367,8 @@
     }
   }
 
-  function download(filename, text) {
-    const blob = new Blob([text], { type: "text/markdown" });
+  function download(filename, text, type = "text/plain") {
+    const blob = new Blob([text], { type });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -380,7 +412,8 @@
       bars: document.querySelector("#bars"),
       checklist: document.querySelector("#checklist"),
       markdownOut: document.querySelector("#markdownOut"),
-      saveState: document.querySelector("#saveState")
+      saveState: document.querySelector("#saveState"),
+      importFile: document.querySelector("#importFile")
     };
 
     writeState(dom, loadDraft() || defaultState());
@@ -411,23 +444,51 @@
       dom.saveState.textContent = status === "copied" ? "Report copied" : "Report selected";
       setTimeout(() => render(dom), 900);
     });
+    document.querySelector("#importJsonBtn").addEventListener("click", () => dom.importFile.click());
+    dom.importFile.addEventListener("change", async () => {
+      const file = dom.importFile.files && dom.importFile.files[0];
+      if (!file) return;
+      try {
+        writeState(dom, parseJsonBackup(await file.text()));
+        render(dom);
+        dom.saveState.textContent = "JSON budget imported";
+        setTimeout(() => render(dom), 1100);
+      } catch (error) {
+        dom.saveState.textContent = "Import failed: choose a saved budget JSON";
+      } finally {
+        dom.importFile.value = "";
+      }
+    });
+    document.querySelector("#exportJsonBtn").addEventListener("click", () => {
+      const state = readDomState(dom);
+      const slug = slugify(state.quantityName) || "uncertainty-budget";
+      download(`${slug}-uncertainty-budget.json`, buildJsonBackup(state), "application/json");
+      dom.saveState.textContent = "JSON budget downloaded";
+      setTimeout(() => render(dom), 1100);
+    });
     document.querySelector("#downloadBtn").addEventListener("click", () => {
       const state = readDomState(dom);
-      const slug = cleanText(state.quantityName).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "uncertainty-budget";
-      download(`${slug}-uncertainty-budget.md`, dom.markdownOut.value);
+      const slug = slugify(state.quantityName) || "uncertainty-budget";
+      download(`${slug}-uncertainty-budget.md`, dom.markdownOut.value, "text/markdown");
     });
     render(dom);
+  }
+
+  function slugify(value) {
+    return cleanText(value).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   }
 
   const api = {
     RULES,
     SAMPLE,
+    buildJsonBackup,
     calculateBudget,
     buildChecklist,
     buildMarkdown,
     copyReport,
     defaultState,
     formatNumber,
+    parseJsonBackup,
     resultSentence
   };
 

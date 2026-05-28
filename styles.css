@@ -88,6 +88,10 @@ button.icon {
   justify-content: end;
 }
 
+.file-input {
+  display: none;
+}
+
 .eyebrow {
   margin: 0 0 6px;
   color: var(--accent-2);

@@ -12,6 +12,7 @@ It runs as a static HTML/CSS/JS app. There are no accounts, keys, uploads, track
 - Draft a report sentence such as `density: 2.708 +/- 0.13 g/cm^3 (k = 2)`.
 - Generate review prompts for missing repeatability, model assumptions, or dominant sources.
 - Copy or download a Markdown uncertainty budget for a lab notebook.
+- Import or export a JSON backup of the current worksheet.
 - Save the current draft only in local browser storage.
 
 ## Good Study And Research Uses
@@ -57,7 +58,7 @@ npm test
 npm run check
 ```
 
-The checks cover distribution conversion, sensitivity weighting, combined and expanded uncertainty, relative uncertainty, ranking, report text, Markdown output, and static JavaScript syntax.
+The checks cover distribution conversion, sensitivity weighting, combined and expanded uncertainty, relative uncertainty, ranking, report text, Markdown output, JSON backup round-trips, and static JavaScript syntax.
 
 ## Core Usage
 
@@ -68,6 +69,7 @@ The checks cover distribution conversion, sensitivity weighting, combined and ex
 5. Enter the sensitivity coefficient from your measurement model.
 6. Read the largest contributors and checklist.
 7. Copy or download the Markdown report into your lab notes.
+8. Export JSON if you want to reuse or share the editable worksheet later.
 
 ## Supported Rules
 
@@ -81,5 +83,5 @@ The checks cover distribution conversion, sensitivity weighting, combined and ex
 
 - Optional correlated-source grouping.
 - Rounding helper for final report formatting.
-- Import/export JSON for class examples.
 - Simple sensitivity-coefficient notes tied to common measurement models.
+- Class-example presets for common lab measurements.

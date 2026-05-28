@@ -1,10 +1,12 @@
 const assert = require("node:assert/strict");
 const {
+  buildJsonBackup,
   calculateBudget,
   buildChecklist,
   buildMarkdown,
   defaultState,
   formatNumber,
+  parseJsonBackup,
   resultSentence
 } = require("./app.js");
 
@@ -48,6 +50,29 @@ function near(actual, expected, tolerance = 1e-9) {
   assert.match(markdown, /Report sentence:/);
   assert.match(markdown, /Variance share/);
   assert.match(markdown, /does not prove a measurement model/);
+}
+
+{
+  const backup = buildJsonBackup({
+    quantityName: "Pipe flow",
+    resultValue: "42",
+    resultUnit: "L/min",
+    coverageFactor: "2.2",
+    rows: [
+      { source: "meter | calibration", type: "Calibration", estimate: "0.18", rule: "normal95", sensitivity: "1.5", note: "vendor cert" }
+    ]
+  });
+  const parsed = parseJsonBackup(backup);
+  assert.equal(parsed.quantityName, "Pipe flow");
+  assert.equal(parsed.resultValue, 42);
+  assert.equal(parsed.coverageFactor, 2.2);
+  assert.equal(parsed.rows[0].source, "meter | calibration");
+  assert.equal(parsed.rows[0].estimate, 0.18);
+  assert.match(backup, /"schemaVersion": 1/);
+}
+
+{
+  assert.throws(() => parseJsonBackup('{"state":{"quantityName":"Missing rows"}}'), /does not contain/);
 }
 
 {
