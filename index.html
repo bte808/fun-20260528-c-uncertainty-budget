@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Uncertainty Budget</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Local lab-study worksheet</p>
+        <h1>Uncertainty Budget</h1>
+      </div>
+      <div class="top-actions" aria-label="Primary actions">
+        <button id="sampleBtn" type="button">Sample</button>
+        <button id="addBtn" type="button">Add source</button>
+        <button id="copyBtn" type="button">Copy report</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="panel setup-panel" aria-labelledby="setup-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Measurement result</p>
+            <h2 id="setup-title">Set the headline number</h2>
+          </div>
+          <span id="saveState" class="save-state">Draft saved locally</span>
+        </div>
+
+        <div class="form-grid">
+          <label>
+            Quantity name
+            <input id="quantityName" type="text" autocomplete="off">
+          </label>
+          <label>
+            Result value
+            <input id="resultValue" type="number" step="any" inputmode="decimal">
+          </label>
+          <label>
+            Result unit
+            <input id="resultUnit" type="text" autocomplete="off">
+          </label>
+          <label>
+            Coverage factor k
+            <input id="coverageFactor" type="number" min="0.1" step="0.1" inputmode="decimal">
+          </label>
+        </div>
+      </section>
+
+      <section class="panel table-panel" aria-labelledby="sources-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Budget sources</p>
+            <h2 id="sources-title">Convert each source to standard uncertainty</h2>
+          </div>
+          <button id="clearBtn" type="button" class="ghost">Clear rows</button>
+        </div>
+
+        <div class="table-shell">
+          <table>
+            <thead>
+              <tr>
+                <th>Source</th>
+                <th>Type</th>
+                <th>Estimate</th>
+                <th>Rule</th>
+                <th>Sensitivity</th>
+                <th>Note</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="rowsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="results-grid">
+        <article class="panel verdict-panel" aria-labelledby="verdict-title">
+          <p class="eyebrow">Report sentence</p>
+          <h2 id="verdict-title">Ready for a lab notebook</h2>
+          <p id="verdictText" class="verdict-text"></p>
+          <div class="stats">
+            <div>
+              <span>Combined standard u</span>
+              <strong id="combinedValue"></strong>
+            </div>
+            <div>
+              <span>Expanded U</span>
+              <strong id="expandedValue"></strong>
+            </div>
+            <div>
+              <span>Relative expanded</span>
+              <strong id="relativeValue"></strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel" aria-labelledby="chart-title">
+          <div class="section-heading tight">
+            <div>
+              <p class="eyebrow">Contribution ranking</p>
+              <h2 id="chart-title">Largest variance shares</h2>
+            </div>
+          </div>
+          <div id="bars" class="bars" aria-live="polite"></div>
+        </article>
+
+        <article class="panel" aria-labelledby="checklist-title">
+          <p class="eyebrow">Study prompts</p>
+          <h2 id="checklist-title">Before trusting the number</h2>
+          <ul id="checklist" class="checklist"></ul>
+        </article>
+
+        <article class="panel report-panel" aria-labelledby="markdown-title">
+          <div class="section-heading tight">
+            <div>
+              <p class="eyebrow">Export</p>
+              <h2 id="markdown-title">Markdown budget</h2>
+            </div>
+            <button id="downloadBtn" type="button" class="ghost">Download</button>
+          </div>
+          <textarea id="markdownOut" readonly spellcheck="false"></textarea>
+        </article>
+      </section>
+    </main>
+
+    <template id="rowTemplate">
+      <tr>
+        <td><input data-field="source" type="text" aria-label="Source name"></td>
+        <td>
+          <select data-field="type" aria-label="Source type">
+            <option value="Type A">Type A</option>
+            <option value="Type B">Type B</option>
+            <option value="Calibration">Calibration</option>
+            <option value="Resolution">Resolution</option>
+            <option value="Model">Model</option>
+          </select>
+        </td>
+        <td><input data-field="estimate" type="number" step="any" inputmode="decimal" aria-label="Estimate"></td>
+        <td>
+          <select data-field="rule" aria-label="Distribution rule">
+            <option value="standard">Already standard u</option>
+            <option value="normal95">95% certificate, divide by 2</option>
+            <option value="rectangular">Rectangular half-width, divide by sqrt(3)</option>
+            <option value="triangular">Triangular half-width, divide by sqrt(6)</option>
+            <option value="resolution">Digital resolution step, divide by sqrt(12)</option>
+          </select>
+        </td>
+        <td><input data-field="sensitivity" type="number" step="any" inputmode="decimal" aria-label="Sensitivity coefficient"></td>
+        <td><input data-field="note" type="text" aria-label="Source note"></td>
+        <td><button type="button" class="icon remove-row" aria-label="Remove row">x</button></td>
+      </tr>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>

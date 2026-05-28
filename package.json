@@ -1,0 +1,20 @@
+{
+  "name": "fun-20260528-c-uncertainty-budget",
+  "version": "1.0.0",
+  "description": "A local uncertainty-budget worksheet for lab reports and measurement review.",
+  "private": false,
+  "scripts": {
+    "start": "python3 -m http.server 5182",
+    "test": "node test.js",
+    "check": "node --check app.js && node test.js"
+  },
+  "keywords": [
+    "uncertainty",
+    "lab",
+    "education",
+    "measurement",
+    "study-tool"
+  ],
+  "author": "",
+  "license": "MIT"
+}
