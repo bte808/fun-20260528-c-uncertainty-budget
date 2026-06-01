@@ -10,6 +10,7 @@ It runs as a static HTML/CSS/JS app. There are no accounts, keys, uploads, track
 - Combine independent sources with sensitivity coefficients.
 - Show the largest variance contributors as a ranked bar chart.
 - Draft a report sentence such as `density: 2.708 +/- 0.13 g/cm^3 (k = 2)`.
+- Suggest a final-report rounding line so the value and expanded uncertainty use the same decimal place.
 - Generate review prompts for missing repeatability, model assumptions, or dominant sources.
 - Copy or download a Markdown uncertainty budget for a lab notebook.
 - Import or export a JSON backup of the current worksheet.
@@ -26,6 +27,8 @@ It runs as a static HTML/CSS/JS app. There are no accounts, keys, uploads, track
 ## Why It Is Useful
 
 Students often memorize the final `value +/- uncertainty` line without seeing which assumption controls it. This tool makes the budget inspectable: every estimate has a conversion rule, every sensitivity coefficient is visible, and the largest contributor is surfaced before the report text is copied.
+
+The worksheet now also gives a cautious rounding hint for the final report line. That makes it easier to move from a scratch calculation to a readable lab-note statement without pretending to replace the course rubric or a formal metrology workflow.
 
 This is intentionally not authoritative. It assumes independent sources and simple rules, does not derive the measurement model, does not validate distributions, and does not replace a textbook, lab manual, calibration certificate, GUM-compliant workflow, or instructor requirement. The bundled sample is example data only.
 
@@ -67,7 +70,7 @@ The checks cover distribution conversion, sensitivity weighting, combined and ex
 3. Add one row per uncertainty source.
 4. Choose the conversion rule that matches how the estimate is stated.
 5. Enter the sensitivity coefficient from your measurement model.
-6. Read the largest contributors and checklist.
+6. Read the largest contributors, rounding hint, and checklist.
 7. Copy or download the Markdown report into your lab notes.
 8. Export JSON if you want to reuse or share the editable worksheet later.
 
@@ -82,6 +85,5 @@ The checks cover distribution conversion, sensitivity weighting, combined and ex
 ## Later Extensions
 
 - Optional correlated-source grouping.
-- Rounding helper for final report formatting.
 - Simple sensitivity-coefficient notes tied to common measurement models.
 - Class-example presets for common lab measurements.

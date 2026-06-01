@@ -150,6 +150,26 @@
     return Number(value.toPrecision(digits)).toString();
   }
 
+  function formatFixedPlace(value, decimals) {
+    if (!Number.isFinite(value)) return "n/a";
+    if (decimals > 8) return value.toExponential(2);
+    return value.toFixed(Math.max(0, decimals));
+  }
+
+  function roundingHint(result) {
+    if (!result.rows.length || !Number.isFinite(result.expanded) || result.expanded <= 0 || !Number.isFinite(result.resultValue)) {
+      return "Add sources first.";
+    }
+    const expanded = Math.abs(result.expanded);
+    const exponent = Math.floor(Math.log10(expanded));
+    const leading = expanded / 10 ** exponent;
+    const digits = leading < 3 ? 2 : 1;
+    const decimals = Math.max(0, digits - 1 - exponent);
+    const roundedExpanded = Number(expanded.toPrecision(digits));
+    const unit = result.resultUnit ? ` ${result.resultUnit}` : "";
+    return `Use ${formatFixedPlace(result.resultValue, decimals)} +/- ${formatFixedPlace(roundedExpanded, decimals)}${unit}.`;
+  }
+
   function resultSentence(result) {
     const unit = result.resultUnit ? ` ${result.resultUnit}` : "";
     const value = Number.isFinite(result.resultValue) ? formatNumber(result.resultValue, 5) : "value";
@@ -197,6 +217,7 @@
       `- Expanded uncertainty: ${formatNumber(result.expanded, 4)}${unit}`,
       `- Coverage factor: ${formatNumber(result.coverageFactor, 3)}`,
       `- Relative expanded uncertainty: ${Number.isFinite(result.relative) ? `${formatNumber(result.relative, 3)}%` : "n/a"}`,
+      `- Rounding hint: ${roundingHint(result)}`,
       "",
       "## Sources",
       "",
@@ -311,6 +332,7 @@
     dom.combinedValue.textContent = `${formatNumber(result.combined, 4)}${unit}`;
     dom.expandedValue.textContent = `${formatNumber(result.expanded, 4)}${unit}`;
     dom.relativeValue.textContent = Number.isFinite(result.relative) ? `${formatNumber(result.relative, 3)}%` : "n/a";
+    dom.roundingHint.textContent = roundingHint(result);
     renderBars(dom, result);
     renderChecklist(dom, result);
     dom.markdownOut.value = buildMarkdown(state);
@@ -328,7 +350,11 @@
       wrapper.className = "bar-row";
       const label = document.createElement("div");
       label.className = "bar-label";
-      label.innerHTML = `<span>${row.source}</span><span>${formatNumber(row.share, 3)}%</span>`;
+      const source = document.createElement("span");
+      source.textContent = row.source;
+      const share = document.createElement("span");
+      share.textContent = `${formatNumber(row.share, 3)}%`;
+      label.append(source, share);
       const track = document.createElement("div");
       track.className = "bar-track";
       const fill = document.createElement("div");
@@ -409,6 +435,7 @@
       combinedValue: document.querySelector("#combinedValue"),
       expandedValue: document.querySelector("#expandedValue"),
       relativeValue: document.querySelector("#relativeValue"),
+      roundingHint: document.querySelector("#roundingHint"),
       bars: document.querySelector("#bars"),
       checklist: document.querySelector("#checklist"),
       markdownOut: document.querySelector("#markdownOut"),
@@ -489,6 +516,7 @@
     defaultState,
     formatNumber,
     parseJsonBackup,
+    roundingHint,
     resultSentence
   };
 

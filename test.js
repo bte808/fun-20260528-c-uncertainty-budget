@@ -7,6 +7,7 @@ const {
   defaultState,
   formatNumber,
   parseJsonBackup,
+  roundingHint,
   resultSentence
 } = require("./app.js");
 
@@ -42,14 +43,29 @@ function near(actual, expected, tolerance = 1e-9) {
   assert.match(resultSentence(result), /Aluminum block density/);
   assert.match(resultSentence(result), /\+\/-/);
   assert.ok(buildChecklist(result).some((item) => item.includes(result.rows[0].source)));
+  assert.match(roundingHint(result), /^Use /);
 }
 
 {
   const markdown = buildMarkdown(defaultState());
   assert.match(markdown, /^# Aluminum block density uncertainty budget/);
   assert.match(markdown, /Report sentence:/);
+  assert.match(markdown, /Rounding hint:/);
   assert.match(markdown, /Variance share/);
   assert.match(markdown, /does not prove a measurement model/);
+}
+
+{
+  const result = calculateBudget({
+    quantityName: "Test mass",
+    resultValue: 12.345,
+    resultUnit: "g",
+    coverageFactor: 2,
+    rows: [{ source: "repeatability", type: "Type A", estimate: 0.063, rule: "standard", sensitivity: 1, note: "" }]
+  });
+  assert.equal(roundingHint(result), "Use 12.35 +/- 0.13 g.");
+  const empty = calculateBudget({ quantityName: "Empty", resultValue: 1, resultUnit: "", coverageFactor: 2, rows: [] });
+  assert.equal(roundingHint(empty), "Add sources first.");
 }
 
 {
