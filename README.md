@@ -4,6 +4,10 @@ Uncertainty Budget is a small local worksheet for lab reports and measurement re
 
 It runs as a static HTML/CSS/JS app. There are no accounts, keys, uploads, trackers, or external runtime services.
 
+## Live Demo
+
+Try it on GitHub Pages: <https://bte808.github.io/fun-20260528-c-uncertainty-budget/>
+
 ## What It Can Do
 
 - Convert common uncertainty estimates into standard uncertainties.
@@ -31,6 +35,13 @@ Students often memorize the final `value +/- uncertainty` line without seeing wh
 The worksheet now also gives a cautious rounding hint for the final report line. That makes it easier to move from a scratch calculation to a readable lab-note statement without pretending to replace the course rubric or a formal metrology workflow.
 
 This is intentionally not authoritative. It assumes independent sources and simple rules, does not derive the measurement model, does not validate distributions, and does not replace a textbook, lab manual, calibration certificate, GUM-compliant workflow, or instructor requirement. The bundled sample is example data only.
+
+## Why Star It
+
+- It is a focused, no-build static tool that can be opened locally or from Pages.
+- It makes uncertainty assumptions visible before a lab report sentence is copied.
+- It exports Markdown and JSON, so the worksheet can move into notebooks or class notes without locking data in the browser.
+- It is intentionally scoped for learning and review, with clear caveats instead of pretending to be a formal metrology package.
 
 ## Why It Is Interesting
 
